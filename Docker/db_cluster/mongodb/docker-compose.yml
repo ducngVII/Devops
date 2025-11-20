@@ -1,5 +1,5 @@
 services:
-  mongo_primary:
+  mongo_primary:   
     image: mongo
     container_name: mongo_primary
     restart: always
@@ -102,3 +102,4 @@ volumes:
     #     { _id: 3, host: "mongo_s2:27017", "priority": 1 }
     #   ]
     # };
+# rs.initiate(config, { force=true});
