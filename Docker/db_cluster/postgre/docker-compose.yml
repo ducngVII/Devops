@@ -1,0 +1,68 @@
+services: 
+  redis:
+    image: redis:latest
+    container_name: redis
+    volumes:
+      - redis_data:/data
+    restart: always
+    networks: 
+      - pg_network
+  postgres-master:
+    build:
+      context: ./pg_master
+      dockerfile: Dockerfile
+    container_name: postgres-master
+
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: admin
+    volumes:
+      - pg_master_data:/var/lib/postgresql/data
+    networks:
+      - pg_network
+  postgres-standby:
+    build:
+      context: ./pg_standby
+      dockerfile: Dockerfile
+    container_name: postgres-standby
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres-master
+    volumes:
+      - pg_standby_data:/var/lib/postgresql/data
+    networks:
+      - pg_network
+  exporter_master:
+    image: bitnami/postgres-exporter:latest
+    container_name: export_master
+    environment:
+      DATA_SOURCE_NAME: "postgresql://appuser:app_pass@postgres-master:5432/appdb?sslmode=disable" # or "postgresql://admin:admin@postgres-master:5432/admin?sslmode=disable"
+    ports:
+      - 9219:9187
+    depends_on:
+      - postgres-master
+    networks:
+      - pg_network
+  exporter_standby:
+    image: bitnami/postgres-exporter:latest
+    container_name: export_standby
+    environment:
+      # exec into master & GRANT CONNECT ON DATABASE appdb TO replicator;
+      DATA_SOURCE_NAME: "postgresql://replicator:replicator_password@postgres-standby:5432/appdb?sslmode=disable"
+    ports:
+      - 9220:9187
+    depends_on:
+      - postgres-standby
+    networks:
+      - pg_network
+
+networks:
+  pg_network:
+    external: true
+
+volumes:
+  redis_data:
+  pg_master_data:
+  pg_standby_data:
