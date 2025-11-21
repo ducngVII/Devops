@@ -13,6 +13,7 @@ x-postgres-common:
 services:
   postgres_primary:
     <<: *postgres-common
+    container_name: pg_primary_v2
     ports:
       - 5432
     environment:
@@ -33,6 +34,7 @@ services:
 
   postgres_replica:
     <<: *postgres-common
+    container_name: pg_replica_v2
     ports:
       - 5432
     environment:
@@ -54,7 +56,7 @@ services:
 
   exporter_pg_master_v2:
     image: bitnami/postgres-exporter:latest
-    container_name: export_master
+    container_name: export_pg_master_v2
     environment:
       DATA_SOURCE_NAME: "postgresql://user:password@postgres_primary:5432/postgres?sslmode=disable" # or "postgresql://admin:admin@postgres-master:5432/admin?sslmode=disable"
     ports:
@@ -65,7 +67,7 @@ services:
       - pg_network
   exporter_standby_v2:
     image: bitnami/postgres-exporter:latest
-    container_name: export_standby
+    container_name: export_pg_standby_v2
     environment:
       # exec into master & GRANT CONNECT ON DATABASE appdb TO replicator;
       DATA_SOURCE_NAME: "postgresql://replicator:replicator_password@postgres_primary:5432/postgres?sslmode=disable"
