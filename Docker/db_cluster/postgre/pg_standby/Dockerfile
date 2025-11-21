@@ -6,5 +6,6 @@ RUN chown -R postgres:postgres /var/lib/postgresql/data
 COPY connect_main.sh /connect_main.sh
 
 RUN chmod +x /connect_main.sh
+EXPose 5432
 
 ENTRYPOINT ["/connect_main.sh"]
