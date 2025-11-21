@@ -12,31 +12,39 @@ scrape_configs:
     static_configs:
       - targets: ['node_exporter:9100']
 
-  - job_name: 'postgres_exporter_on_EC2'  
+  - job_name: 'pg_on_EC2'  
     static_configs:
       - targets: ['13.250.100.13:9187'] 
   
-  - job_name: 'exporter_master'
+  - job_name: 'pg_master_v1'
     static_configs:
       - targets: ['export_master:9187']
 
-  - job_name: 'exporter_standby'
+  - job_name: 'pg_standby_v1'
     static_configs:
       - targets: ['export_standby:9187']
+
+  - job_name: 'pg_primary_v2'
+    static_configs:
+      - targets: ['exporter_pg_master_v2:9187']
   
-  - job_name: 'exporter_primary'
+  - job_name: 'pg_replica_v2'
+    static_configs:
+      - targets: ['exporter_standby_v2:9187']
+  
+  - job_name: 'mongo_primary'
     static_configs:
       - targets: ['export_primary:9216']
 
-  - job_name: 'exporter_s1'
+  - job_name: 'mongo_s1'
     static_configs:
       - targets: ['export_s1:9216']
   
-  - job_name: 'exporter_s2'
+  - job_name: 'mongo_s2'
     static_configs:
       - targets: ['export_s2:9216']
 
-  - job_name: 'blackbox_exporter'
+  - job_name: 'web_exporter'
     metrics_path: /probe
     params:
       module: [http_2xx]  # Sử dụng module "http_2xx" đã định nghĩa trong cấu hình blackbox
